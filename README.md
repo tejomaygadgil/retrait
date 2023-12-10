@@ -1,4 +1,4 @@
 # Retrait
-<img src="./retrait.png" width=20%>
+<img src="./retrait.png" width=40%>
 
-Organize your browser history using networks.
+Organize your browser history into a network.
