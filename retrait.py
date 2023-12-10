@@ -7,53 +7,68 @@ class Link:
     def __repr__(self):
         return f"msg='{self.msg}'"
 
-    def add(self, msg):
+    def add_link(self, msg):
         link = Link(msg, self)
         self.children.append(link)
 
 
 class Browser:
     def __init__(self):
-        self.tabs = []
-        self.head = None
+        self.root = Link("root")
+        self.tabs = [self.root]
+        self.head = 0
 
     def __repr__(self):
         return f"i={self.head}, tabs={self.tabs}"
 
-    def get_head(self):
+    def current_tab(self) -> Link:
         return self.tabs[self.head]
 
-    def set_head(self, link):
+    def add_tab(self, link) -> None:
+        self.tabs.append(link)
+
+    def update_tab(self, link) -> None:
+        assert type(link) is Link, "Insert link"
         self.tabs[self.head] = link
 
-    def open_new(self, msg):
-        link = Link(msg)
-        self.tabs.append(link)
-        self.head = len(self.tabs) - 1
+    def forward(self, msg, bg=False):
+        tab = self.current_tab()
+        tab.add_link(msg)
+        new_link = tab.children[-1]
+        if bg:
+            self.add_tab(new_link)
+        else:
+            self.update_tab(new_link)
 
-    def forward(self, msg):
-        head = self.get_head()
-        head.add(msg)
-        self.set_head(head.children[-1])
+    def new_tab(self, bg=False):
+        self.forward("New tab", bg)
 
     def backward(self):
-        head = self.get_head()
-        self.set_head(head.parent)
-
-    def open_tab(self, msg):
-        head = self.get_head()
-        head.add(msg)
-        self.tabs.append(head.children[-1])
+        new_link = self.current_tab().parent
+        self.update_tab(new_link)
 
     def switch_tab(self, msg):
         for i, tab in enumerate(self.tabs):
             if tab.msg == msg:
                 self.head = i
 
-    def close_tab(self, msg):
-        for i, tab in enumerate(self.tabs):
-            if tab.msg == msg:
-                del self.tabs[i]
+    # def close_tab(self, msg):
+    #    for i, tab in enumerate(self.tabs):
+    #        if tab.msg == msg:
+    #            del self.tabs[i]
+
+    def find(self, msg):
+        def recursive_search(link, msg):
+            result = []
+            if link.msg == msg:
+                result.append(link)
+            if link.children:
+                for child in link.children:
+                    result.extend(recursive_search(child, msg))
+
+            return result
+
+        return recursive_search(self.root, msg)
 
 
 if __name__ == "__main__":
@@ -66,11 +81,13 @@ if __name__ == "__main__":
     ]
 
     browser = Browser()
-
-    browser.open_new(urls[0])
+    browser.new_tab()
+    browser.forward(urls[0])
     browser.forward(urls[1])
     browser.backward()
-    browser.open_tab(urls[2])
-    browser.open_tab(urls[3])
+    browser.forward(urls[2], bg=True)
+    browser.forward(urls[3], bg=True)
     browser.switch_tab(urls[2])
     browser.forward(urls[4])
+    browser.forward(urls[2])
+    print(browser.find(urls[2]))
