@@ -1,0 +1,54 @@
+---
+title: "retrait"
+format: html
+execute: 
+    cache: true
+---
+
+![](./retrait.png){width=30%}
+
+Retrait organizes your browser history into a network, allowing you to easily access tabs and avoid forgetting why you opened them in the first place.
+
+Let's build a prototype so we can get to iterating!
+
+### Simplified model of web browsing
+
+Browsers are complicated so let's simplify them by implementing only two actions:
+
+- Move forward in a tab
+- Open a new tab
+
+
+
+
+### Browsing is inherently network-based
+
+What are we doing when we surf the web? 
+
+Basically, hopping around a _network_: either by following links on a page, or own path of links we have visited.
+
+But progress is rarely linear: for every linked clicked there are 3 "what was that page again"? Therefore we need to separate the actual links that have been visited from our access of them.
+
+Here is the proposal:
+
+> Links can be represented as a tree (T for tree), while accessing can be a list pointing nodes on that tree (N for navigator). This way we can preserve a coherent link-structure while being able to jump around it non-linearly.
+
+Let's try it out and see where it takes us!
+
+### 5 actions of browsing
+
+Here's the moveset we will try to implement:
+
+|Action|Type|
+|---|---|
+|Change URL|T / N|
+|Open a link|T / N|
+|Open a link in a new tab|T / N|
+|Backward|N|
+|Forward|N|
+|New tab|T / N|
+|Close a tab|N|
+
+As we can see there are only three operations that require modifying the tree: opening a link, opening a link in a new tab 
+
+### Linked lists
